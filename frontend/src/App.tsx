@@ -148,7 +148,12 @@ export function App(): JSX.Element {
             {data.rooms.map((room) => (
               <Accordion.Item key={room.id} value={room.id}>
                 <Accordion.ItemTrigger>
-                  <span>{room.name}</span>
+                  <Stack gap={0} align="flex-start" textAlign="left">
+                    <Text fontWeight="semibold">{room.room_number}</Text>
+                    <Text fontSize="sm" color="fg.muted">
+                      {room.description}
+                    </Text>
+                  </Stack>
                 </Accordion.ItemTrigger>
                 <Accordion.ItemContent>
                   <Stack gap={4} pt={2}>

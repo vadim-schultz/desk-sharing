@@ -14,7 +14,13 @@ from litestar.testing import TestClient
 @pytest.fixture
 def room_desk() -> tuple[uuid.UUID, uuid.UUID]:
     with SessionLocal() as session:
-        room = Room(id=uuid.uuid4(), name="Test room", sort_order=0)
+        room = Room(
+            id=uuid.uuid4(),
+            room_number="T-1",
+            description="Test room",
+            name="T-1 - Test room",
+            sort_order=0,
+        )
         session.add(room)
         session.flush()
         desk = Desk(

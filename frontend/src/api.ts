@@ -13,6 +13,8 @@ export interface DeskDto {
 
 export interface RoomDto {
   id: string;
+  room_number: string;
+  description: string;
   name: string;
   desks: DeskDto[];
 }

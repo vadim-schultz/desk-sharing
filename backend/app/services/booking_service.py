@@ -62,7 +62,9 @@ class BookingService:
 
         rooms = list(
             self._session.scalars(
-                select(Room).options(joinedload(Room.desks)).order_by(Room.sort_order, Room.name)
+                select(Room)
+                .options(joinedload(Room.desks))
+                .order_by(Room.sort_order, Room.room_number, Room.name)
             ).unique()
         )
 
@@ -89,7 +91,15 @@ class BookingService:
                         booking_id=booking_id,
                     )
                 )
-            result.append(RoomRead(id=room.id, name=room.name, desks=desks_out))
+            result.append(
+                RoomRead(
+                    id=room.id,
+                    room_number=room.room_number,
+                    description=room.description,
+                    name=room.name,
+                    desks=desks_out,
+                )
+            )
         return day, result
 
     def _desk_status(

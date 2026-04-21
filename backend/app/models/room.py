@@ -16,7 +16,9 @@ class Room(Base):
     __tablename__ = "rooms"
 
     id: Mapped[uuid.UUID] = mapped_column(Uuid(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    name: Mapped[str] = mapped_column(String(200), nullable=False)
+    room_number: Mapped[str] = mapped_column(String(64), nullable=False)
+    description: Mapped[str] = mapped_column(String(500), nullable=False)
+    name: Mapped[str] = mapped_column(String(600), nullable=False)
     sort_order: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
 
     desks: Mapped[list[Desk]] = relationship(

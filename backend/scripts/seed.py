@@ -1,4 +1,4 @@
-"""Insert demo rooms and desks."""
+"""Insert rooms from `rooms.txt` and one desk per room."""
 
 from __future__ import annotations
 
@@ -6,48 +6,46 @@ import uuid
 
 from app.db import SessionLocal, engine
 from app.models import Desk, Room
+from app.rooms_txt import default_rooms_txt_path, parse_rooms_file, room_display_name
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 
 def seed(session: Session) -> None:
-    r1 = Room(id=uuid.uuid4(), name="Quiet zone", sort_order=0)
-    r2 = Room(id=uuid.uuid4(), name="Collaboration", sort_order=1)
-    session.add_all([r1, r2])
+    rows = parse_rooms_file(default_rooms_txt_path())
+    if not rows:
+        msg = "no rooms parsed from rooms.txt"
+        raise ValueError(msg)
+
+    rooms: list[Room] = []
+    for sort_order, (room_number, description) in enumerate(rows):
+        name = room_display_name(room_number, description)
+        rooms.append(
+            Room(
+                id=uuid.uuid4(),
+                room_number=room_number,
+                description=description,
+                name=name,
+                sort_order=sort_order,
+            )
+        )
+    session.add_all(rooms)
     session.flush()
 
-    desks = [
-        Desk(
-            id=uuid.uuid4(),
-            room_id=r1.id,
-            name="Desk A",
-            bookable=True,
-            monitor_count=2,
-            has_keyboard=True,
-            has_mouse=True,
-            sort_order=0,
-        ),
-        Desk(
-            id=uuid.uuid4(),
-            room_id=r1.id,
-            name="Desk B",
-            bookable=True,
-            monitor_count=1,
-            has_keyboard=True,
-            has_mouse=False,
-            sort_order=1,
-        ),
-        Desk(
-            id=uuid.uuid4(),
-            room_id=r2.id,
-            name="Hot desk 1",
-            bookable=False,
-            monitor_count=0,
-            has_keyboard=False,
-            has_mouse=False,
-            sort_order=0,
-        ),
-    ]
+    desks: list[Desk] = []
+    for room in rooms:
+        desks.append(
+            Desk(
+                id=uuid.uuid4(),
+                room_id=room.id,
+                name="Desk 1",
+                bookable=True,
+                monitor_count=1,
+                has_keyboard=True,
+                has_mouse=True,
+                sort_order=0,
+            )
+        )
     session.add_all(desks)
 
 

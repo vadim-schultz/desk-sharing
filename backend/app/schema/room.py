@@ -11,5 +11,7 @@ class RoomRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: uuid.UUID
-    name: str = Field(..., min_length=1, max_length=200)
+    room_number: str = Field(..., min_length=1, max_length=64)
+    description: str = Field(default="", max_length=500)
+    name: str = Field(..., min_length=1, max_length=600)
     desks: list[DeskRead]
