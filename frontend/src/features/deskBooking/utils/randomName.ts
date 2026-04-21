@@ -1,23 +1,23 @@
 const ADJECTIVES = [
-  "curious",
-  "mighty",
-  "swift",
-  "quiet",
-  "bright",
-  "gentle",
-  "lucky",
-  "clever",
+  'curious',
+  'mighty',
+  'swift',
+  'quiet',
+  'bright',
+  'gentle',
+  'lucky',
+  'clever',
 ] as const;
 
 const ANIMALS = [
-  "mouse",
-  "moose",
-  "fox",
-  "heron",
-  "badger",
-  "otter",
-  "lark",
-  "bear",
+  'mouse',
+  'moose',
+  'fox',
+  'heron',
+  'badger',
+  'otter',
+  'lark',
+  'bear',
 ] as const;
 
 function randomInt(max: number): number {
@@ -25,8 +25,8 @@ function randomInt(max: number): number {
 }
 
 function randomSuffix(): string {
-  const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
-  let s = "";
+  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  let s = '';
   for (let i = 0; i < 6; i += 1) {
     s += chars[randomInt(chars.length)]!;
   }

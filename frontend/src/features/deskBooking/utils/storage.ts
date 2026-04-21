@@ -1,4 +1,4 @@
-const PREFIX = "desk-sharing:booking:";
+const PREFIX = 'desk-sharing:booking:';
 
 export interface StoredBooking {
   bookingId: string;
@@ -9,14 +9,17 @@ export function storageKey(deskId: string, bookingDate: string): string {
   return `${PREFIX}${deskId}:${bookingDate}`;
 }
 
-export function loadStoredBooking(deskId: string, bookingDate: string): StoredBooking | null {
+export function loadStoredBooking(
+  deskId: string,
+  bookingDate: string,
+): StoredBooking | null {
   const raw = sessionStorage.getItem(storageKey(deskId, bookingDate));
   if (!raw) {
     return null;
   }
   try {
     const v = JSON.parse(raw) as StoredBooking;
-    if (typeof v.bookingId === "string" && typeof v.displayName === "string") {
+    if (typeof v.bookingId === 'string' && typeof v.displayName === 'string') {
       return v;
     }
   } catch {
@@ -30,9 +33,8 @@ export function saveStoredBooking(
   bookingDate: string,
   value: StoredBooking,
 ): void {
-  sessionStorage.setItem(storageKey(deskId, bookingDate), JSON.stringify(value));
-}
-
-export function clearStoredBooking(deskId: string, bookingDate: string): void {
-  sessionStorage.removeItem(storageKey(deskId, bookingDate));
+  sessionStorage.setItem(
+    storageKey(deskId, bookingDate),
+    JSON.stringify(value),
+  );
 }

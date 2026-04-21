@@ -1,4 +1,4 @@
-"""Insert rooms from `rooms.txt` and one desk per room."""
+"""Insert rooms from `rooms.txt` and four desks per room."""
 
 from __future__ import annotations
 
@@ -34,18 +34,19 @@ def seed(session: Session) -> None:
 
     desks: list[Desk] = []
     for room in rooms:
-        desks.append(
-            Desk(
-                id=uuid.uuid4(),
-                room_id=room.id,
-                name="Desk 1",
-                bookable=True,
-                monitor_count=1,
-                has_keyboard=True,
-                has_mouse=True,
-                sort_order=0,
+        for i in range(4):
+            desks.append(
+                Desk(
+                    id=uuid.uuid4(),
+                    room_id=room.id,
+                    name=f"Desk {i + 1}",
+                    bookable=True,
+                    monitor_count=1,
+                    has_keyboard=True,
+                    has_mouse=True,
+                    sort_order=i,
+                )
             )
-        )
     session.add_all(desks)
 
 

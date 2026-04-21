@@ -15,6 +15,7 @@ from app.schema.room import RoomRead
 from app.timeutil import (
     get_zone,
     is_booking_date_allowed,
+    is_past_same_day_booking_cutoff,
     is_pending_release,
     today_in_zone,
 )
@@ -125,6 +126,9 @@ class BookingService:
         if not is_booking_date_allowed(data.booking_date, today, max_ahead=5):
             msg = "booking_date is outside the allowed window"
             raise ValueError(msg)
+        if data.booking_date == today and is_past_same_day_booking_cutoff(now, self._tz):
+            msg = "same-day bookings are not available after 10:00"
+            raise ValueError(msg)
 
         desk = self._session.get(Desk, data.desk_id)
         if desk is None or not desk.bookable:
@@ -180,6 +184,9 @@ class BookingService:
             raise ValueError(msg)
         if booking.display_name.strip() != display_name.strip():
             msg = "display name does not match"
+            raise ValueError(msg)
+        if booking.booking_date != today_in_zone(self._tz, now=now):
+            msg = "check-in only on the booking day"
             raise ValueError(msg)
         if is_pending_release(
             booking_date=booking.booking_date,

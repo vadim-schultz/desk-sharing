@@ -42,6 +42,20 @@ def is_pending_release(
     return now_local > cutoff_local
 
 
+def is_past_same_day_booking_cutoff(now: datetime, tz: ZoneInfo) -> bool:
+    """True if local time is past 10:00 on today's calendar date in tz."""
+    if now.tzinfo is None:
+        msg = "now must be timezone-aware"
+        raise ValueError(msg)
+    today = today_in_zone(tz, now=now)
+    return is_pending_release(
+        booking_date=today,
+        checked_in_at=None,
+        now=now,
+        tz=tz,
+    )
+
+
 def is_booking_date_allowed(booking_date: date, today: date, max_ahead: int = 5) -> bool:
     last = booking_horizon_end(today, max_ahead)
     return today <= booking_date <= last
