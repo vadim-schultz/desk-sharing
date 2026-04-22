@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import os
 
-os.environ.setdefault("DATABASE_URL", "postgresql+psycopg://desk:desk@localhost:5432/desk")
+os.environ.setdefault("DATABASE_URL", "sqlite+pysqlite:///:memory:")
 os.environ["MAINTENANCE_TASK_ENABLED"] = "false"
 
 import pytest
