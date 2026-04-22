@@ -7,6 +7,7 @@ import uuid
 from app.db import SessionLocal, engine
 from app.models import Desk, Room
 from app.rooms_txt import default_rooms_txt_path, parse_rooms_file, room_display_name
+from app.seed_admin import ensure_admin_password
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -52,9 +53,9 @@ def seed(session: Session) -> None:
 
 def main() -> None:
     with SessionLocal() as session:
-        if session.scalar(select(Room.id).limit(1)) is not None:
-            return
-        seed(session)
+        ensure_admin_password(session)
+        if session.scalar(select(Room.id).limit(1)) is None:
+            seed(session)
         session.commit()
     engine.dispose()
 

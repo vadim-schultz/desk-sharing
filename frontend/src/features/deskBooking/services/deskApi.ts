@@ -2,7 +2,7 @@ import type { RoomsResponse } from '../types';
 
 const base = import.meta.env.VITE_API_BASE ?? '/api';
 
-function url(path: string): string {
+export function url(path: string): string {
   const p = path.startsWith('/') ? path : `/${path}`;
   if (base === '' || base === '/') {
     return p;

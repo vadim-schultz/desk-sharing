@@ -5,7 +5,7 @@ from datetime import date, datetime
 
 from app.config import settings
 from app.models import Booking, Desk, Room
-from app.repositories import BookingRepository, RoomRepository
+from app.repositories import BookingRepository, DeskRepository, RoomRepository
 from app.schema.booking import BookingCreate, BookingCreated
 from app.schema.desk import DeskRead
 from app.schema.enums import DeskDayStatus
@@ -20,9 +20,15 @@ from app.timeutil import (
 
 
 class BookingService:
-    def __init__(self, room_repo: RoomRepository, booking_repo: BookingRepository) -> None:
+    def __init__(
+        self,
+        room_repo: RoomRepository,
+        booking_repo: BookingRepository,
+        desk_repo: DeskRepository,
+    ) -> None:
         self._rooms = room_repo
         self._bookings = booking_repo
+        self._desks = desk_repo
         self._tz = get_zone(settings.app_timezone)
 
     def release_stale_pending(self, now: datetime | None = None) -> int:
@@ -128,7 +134,7 @@ class BookingService:
             msg = "same-day bookings are not available after 10:00"
             raise ValueError(msg)
 
-        desk = self._rooms.get_desk(data.desk_id)
+        desk = self._desks.get(data.desk_id)
         if desk is None or not desk.bookable:
             msg = "desk is not bookable"
             raise ValueError(msg)

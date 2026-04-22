@@ -4,6 +4,7 @@ import { StrictMode } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 
 import { ColorModeProvider } from '../components/ui/color-mode';
+import { AuthProvider } from '../features/auth/context/AuthContext';
 import { queryClient } from './queryClient';
 import App from './App';
 
@@ -16,7 +17,9 @@ const AppBootstrap = () => (
       <ChakraProvider value={defaultSystem}>
         <ColorModeProvider>
           <BrowserRouter>
-            <App />
+            <AuthProvider>
+              <App />
+            </AuthProvider>
           </BrowserRouter>
         </ColorModeProvider>
       </ChakraProvider>

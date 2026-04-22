@@ -9,7 +9,9 @@ description = "Desk sharing booking API"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
+    "bcrypt>=4.2,<5",
     "litestar[standard]>=2.12,<3",
+    "PyJWT[crypto]>=2.9,<3",
     "sqlalchemy>=2.0,<3",
     "alembic>=1.14,<2",
     "pydantic>=2.10,<3",

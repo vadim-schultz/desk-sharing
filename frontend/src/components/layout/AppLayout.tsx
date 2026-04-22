@@ -1,7 +1,20 @@
-import { Box, Container, Heading, HStack, VStack } from '@chakra-ui/react';
+import {
+  Box,
+  Container,
+  Heading,
+  HStack,
+  IconButton,
+  Menu,
+  Portal,
+  VStack,
+} from '@chakra-ui/react';
 import type { ReactNode } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
+import { useState } from 'react';
+import { FaUser } from 'react-icons/fa';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 
+import PasswordModal from '../../features/auth/components/PasswordModal';
+import { useAuth } from '../../features/auth/context/AuthContext';
 import ColorModeToggle from './ColorModeToggle';
 
 interface AppLayoutProps {
@@ -9,6 +22,10 @@ interface AppLayoutProps {
 }
 
 const AppLayout = ({ children }: AppLayoutProps) => {
+  const navigate = useNavigate();
+  const { isAuthenticated, clearToken } = useAuth();
+  const [pwOpen, setPwOpen] = useState(false);
+
   return (
     <VStack align="stretch" minH="100vh" gap={0} bg="bg">
       <Box
@@ -28,7 +45,42 @@ const AppLayout = ({ children }: AppLayoutProps) => {
             >
               <Heading size="md">Desk sharing</Heading>
             </RouterLink>
-            <ColorModeToggle />
+            <HStack gap={1}>
+              <Menu.Root positioning={{ placement: 'bottom-end' }}>
+                <Menu.Trigger asChild>
+                  <IconButton
+                    aria-label="Account menu"
+                    variant="ghost"
+                    size="sm"
+                    colorPalette="gray"
+                  >
+                    <FaUser />
+                  </IconButton>
+                </Menu.Trigger>
+                <Portal>
+                  <Menu.Positioner>
+                    <Menu.Content minW="220px">
+                      <Menu.Item
+                        value="admin"
+                        onClick={() => navigate('/admin/rooms')}
+                      >
+                        Admin: rooms & desks
+                      </Menu.Item>
+                      {isAuthenticated ? (
+                        <Menu.Item value="signout" onClick={() => clearToken()}>
+                          Sign out of admin
+                        </Menu.Item>
+                      ) : (
+                        <Menu.Item value="signin" onClick={() => setPwOpen(true)}>
+                          Sign in to admin…
+                        </Menu.Item>
+                      )}
+                    </Menu.Content>
+                  </Menu.Positioner>
+                </Portal>
+              </Menu.Root>
+              <ColorModeToggle />
+            </HStack>
           </HStack>
         </Container>
       </Box>
@@ -38,6 +90,8 @@ const AppLayout = ({ children }: AppLayoutProps) => {
           {children}
         </Container>
       </Box>
+
+      <PasswordModal open={pwOpen} onOpenChange={setPwOpen} />
     </VStack>
   );
 };

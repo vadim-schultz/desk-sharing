@@ -12,6 +12,8 @@ python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
 export DATABASE_URL=postgresql+psycopg://desk:desk@localhost:5432/desk
 export APP_TIMEZONE=Europe/Berlin
+# Optional: admin JWT signing (defaults are fine for local dev).
+# export JWT_SECRET=your-secret
 alembic upgrade head
 python -m scripts.seed
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
