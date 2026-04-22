@@ -6,9 +6,9 @@ from zoneinfo import ZoneInfo
 
 import pytest
 from app.db import SessionLocal
+from app.dependencies import create_booking_service
 from app.models import Booking, Desk, Room
 from app.schema.booking import BookingCreate
-from app.services.booking_service import BookingService
 from sqlalchemy import select
 
 
@@ -56,7 +56,7 @@ def test_create_same_day_after_10_raises(two_desks: tuple[uuid.UUID, uuid.UUID])
     now = datetime.combine(today, time(10, 1), tzinfo=tz)
 
     with SessionLocal() as session:
-        svc = BookingService(session)
+        svc = create_booking_service(session)
         with pytest.raises(ValueError, match="same-day bookings are not available"):
             svc.create_booking(
                 BookingCreate(
@@ -75,7 +75,7 @@ def test_two_same_day_bookings_before_cutoff(two_desks: tuple[uuid.UUID, uuid.UU
     now = datetime.combine(today, time(9, 30), tzinfo=tz)
 
     with SessionLocal() as session:
-        svc = BookingService(session)
+        svc = create_booking_service(session)
         svc.create_booking(
             BookingCreate(desk_id=d1, booking_date=today, display_name="a"),
             now=now,
@@ -103,7 +103,7 @@ def test_check_in_only_on_booking_day(
     now_today = datetime.combine(today, time(9, 0), tzinfo=tz)
 
     with SessionLocal() as session:
-        svc = BookingService(session)
+        svc = create_booking_service(session)
         created = svc.create_booking(
             BookingCreate(
                 desk_id=desk_id,
@@ -116,6 +116,6 @@ def test_check_in_only_on_booking_day(
         booking_id = created.id
 
     with SessionLocal() as session:
-        svc = BookingService(session)
+        svc = create_booking_service(session)
         with pytest.raises(ValueError, match="check-in only on the booking day"):
             svc.check_in(booking_id, "future-book", now=now_today)

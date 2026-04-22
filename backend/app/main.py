@@ -1,32 +1,24 @@
 from __future__ import annotations
 
+from importlib import import_module
+
 import uvicorn
 from litestar import Litestar
-from litestar.config.cors import CORSConfig
-from litestar.di import Provide
-from sqlalchemy.orm import Session
 
+from app.background.runner import start_maintenance_thread, stop_maintenance_thread
 from app.controllers import BookingsController, RoomsController, health_check
-from app.db import provide_session
-from app.services.booking_service import BookingService
-
-
-def provide_booking_service(session: Session) -> BookingService:
-    return BookingService(session)
+from app.dependencies import dependencies
+from app.middleware.cors import cors_config
 
 
 def create_app() -> Litestar:
+    import_module("app.background.callbacks")
     return Litestar(
         route_handlers=[RoomsController, BookingsController, health_check],
-        dependencies={
-            "session": Provide(provide_session),
-            "booking_service": Provide(provide_booking_service, sync_to_thread=False),
-        },
-        cors_config=CORSConfig(
-            allow_origins=["*"],
-            allow_methods=["*"],
-            allow_headers=["*"],
-        ),
+        dependencies=dependencies,
+        cors_config=cors_config,
+        on_startup=[start_maintenance_thread],
+        on_shutdown=[stop_maintenance_thread],
     )
 
 

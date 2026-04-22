@@ -5,21 +5,12 @@ from collections.abc import Generator
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session, sessionmaker
-from sqlalchemy.pool import StaticPool
 
 from app.config import settings
 
 
 def _create_engine() -> Engine:
-    url = settings.database_url
-    if url.startswith("sqlite"):
-        return create_engine(
-            url,
-            connect_args={"check_same_thread": False},
-            poolclass=StaticPool,
-            future=True,
-        )
-    return create_engine(url, echo=False, future=True)
+    return create_engine(settings.database_url, echo=False, future=True)
 
 
 engine = _create_engine()

@@ -3,11 +3,9 @@ from __future__ import annotations
 import uuid
 from datetime import date, datetime
 
-from sqlalchemy import select
-from sqlalchemy.orm import Session, joinedload
-
 from app.config import settings
 from app.models import Booking, Desk, Room
+from app.repositories import BookingRepository, RoomRepository
 from app.schema.booking import BookingCreate, BookingCreated
 from app.schema.desk import DeskRead
 from app.schema.enums import DeskDayStatus
@@ -22,8 +20,9 @@ from app.timeutil import (
 
 
 class BookingService:
-    def __init__(self, session: Session) -> None:
-        self._session = session
+    def __init__(self, room_repo: RoomRepository, booking_repo: BookingRepository) -> None:
+        self._rooms = room_repo
+        self._bookings = booking_repo
         self._tz = get_zone(settings.app_timezone)
 
     def release_stale_pending(self, now: datetime | None = None) -> int:
@@ -33,9 +32,7 @@ class BookingService:
         elif now.tzinfo is None:
             msg = "now must be timezone-aware"
             raise ValueError(msg)
-        pending = self._session.scalars(
-            select(Booking).where(Booking.checked_in_at.is_(None))
-        ).all()
+        pending = self._bookings.list_unchecked_bookings()
         deleted = 0
         for b in pending:
             if is_pending_release(
@@ -44,7 +41,7 @@ class BookingService:
                 now=now,
                 tz=self._tz,
             ):
-                self._session.delete(b)
+                self._bookings.delete(b)
                 deleted += 1
         return deleted
 
@@ -57,28 +54,30 @@ class BookingService:
             msg = "now must be timezone-aware"
             raise ValueError(msg)
 
-        self.release_stale_pending(now=now)
-
         day = view_date if view_date is not None else today_in_zone(self._tz, now=now)
+        # Stale pending release: background task (see `app.background.runner`).
 
-        rooms = list(
-            self._session.scalars(
-                select(Room)
-                .options(joinedload(Room.desks))
-                .order_by(Room.sort_order, Room.room_number, Room.name)
-            ).unique()
-        )
+        rows = self._rooms.list_rooms_with_desk_booking_for_date(day)
+        order: list[uuid.UUID] = []
+        grouped: dict[uuid.UUID, list[tuple[Desk, Booking | None]]] = {}
+        room_by_id: dict[uuid.UUID, Room] = {}
+        for room, desk, booking in rows:
+            if room.id not in room_by_id:
+                room_by_id[room.id] = room
+                order.append(room.id)
+                grouped[room.id] = []
+            if desk is not None:
+                grouped[room.id].append((desk, booking))
 
         result: list[RoomRead] = []
-        for room in rooms:
+        for rid in order:
+            room = room_by_id[rid]
+            desk_pairs = sorted(
+                grouped[rid],
+                key=lambda t: (t[0].sort_order, t[0].name),
+            )
             desks_out: list[DeskRead] = []
-            for desk in sorted(room.desks, key=lambda d: (d.sort_order, d.name)):
-                booking = self._session.scalar(
-                    select(Booking).where(
-                        Booking.desk_id == desk.id,
-                        Booking.booking_date == day,
-                    )
-                )
+            for desk, booking in desk_pairs:
                 status, booking_id = self._desk_status(desk, booking)
                 desks_out.append(
                     DeskRead(
@@ -121,7 +120,6 @@ class BookingService:
             msg = "now must be timezone-aware"
             raise ValueError(msg)
 
-        self.release_stale_pending(now=now)
         today = today_in_zone(self._tz, now=now)
         if not is_booking_date_allowed(data.booking_date, today, max_ahead=5):
             msg = "booking_date is outside the allowed window"
@@ -130,17 +128,12 @@ class BookingService:
             msg = "same-day bookings are not available after 10:00"
             raise ValueError(msg)
 
-        desk = self._session.get(Desk, data.desk_id)
+        desk = self._rooms.get_desk(data.desk_id)
         if desk is None or not desk.bookable:
             msg = "desk is not bookable"
             raise ValueError(msg)
 
-        existing = self._session.scalar(
-            select(Booking).where(
-                Booking.desk_id == data.desk_id,
-                Booking.booking_date == data.booking_date,
-            )
-        )
+        existing = self._bookings.get_by_desk_and_date(data.desk_id, data.booking_date)
         if existing is not None:
             msg = "desk already has a booking for that date"
             raise ValueError(msg)
@@ -152,8 +145,8 @@ class BookingService:
             checked_in_at=None,
             created_at=now,
         )
-        self._session.add(booking)
-        self._session.flush()
+        self._bookings.add(booking)
+        self._bookings.flush()
         return BookingCreated(
             id=booking.id,
             desk_id=booking.desk_id,
@@ -173,9 +166,7 @@ class BookingService:
             msg = "now must be timezone-aware"
             raise ValueError(msg)
 
-        self.release_stale_pending(now=now)
-
-        booking = self._session.get(Booking, booking_id)
+        booking = self._bookings.get_by_id(booking_id)
         if booking is None:
             msg = "booking not found"
             raise ValueError(msg)
@@ -198,7 +189,7 @@ class BookingService:
             raise ValueError(msg)
 
         booking.checked_in_at = now
-        self._session.flush()
+        self._bookings.flush()
         return BookingCreated(
             id=booking.id,
             desk_id=booking.desk_id,
