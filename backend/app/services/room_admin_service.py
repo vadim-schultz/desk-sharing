@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import uuid
+from typing import cast
 
 from litestar.exceptions import NotFoundException
 from sqlalchemy.orm import Session
@@ -35,11 +36,12 @@ class RoomAdminService:
         self._rooms = rooms
 
     def list(self, query: RoomListQuery) -> AdminRoomsListResponse:
-        raw = self._rooms.list(query)
+        raw = self._rooms.list_rooms(query)
         if raw and isinstance(raw[0], tuple):
             msg = "admin room list must not set booking_date on filter"
             raise ValueError(msg)
-        return AdminRoomsListResponse(rooms=[to_admin_room_read(r) for r in raw])
+        rooms = cast("list[Room]", raw)
+        return AdminRoomsListResponse(rooms=[to_admin_room_read(r) for r in rooms])
 
     def get(self, room_id: uuid.UUID) -> AdminRoomRead:
         room = self._rooms.get(room_id)

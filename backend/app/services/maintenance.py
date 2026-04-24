@@ -10,9 +10,7 @@ from app.schema.booking import BookingListFilter
 from app.timeutil import get_zone, is_pending_release
 
 
-def release_stale_pending_bookings(
-    session: Session, now: datetime | None = None
-) -> int:
+def release_stale_pending_bookings(session: Session, now: datetime | None = None) -> int:
     """Delete unchecked bookings past the release cutoff on their booking day."""
     tz = get_zone(settings.app_timezone)
     if now is None:

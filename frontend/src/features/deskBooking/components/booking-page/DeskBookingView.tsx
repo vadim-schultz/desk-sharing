@@ -65,7 +65,11 @@ export default function DeskBookingView({
           timezone={timezone}
         />
 
-        <DeskBookingQueryStatus loading={loading} isError={isError} error={error} />
+        <DeskBookingQueryStatus
+          loading={loading}
+          isError={isError}
+          error={error}
+        />
 
         {rooms !== null ? (
           <DeskRoomsAccordion

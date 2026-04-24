@@ -9,7 +9,10 @@ interface AdminSignInGateProps {
 }
 
 /** Shown when the user must authenticate before using an admin screen. */
-export default function AdminSignInGate({ title, description }: AdminSignInGateProps) {
+export default function AdminSignInGate({
+  title,
+  description,
+}: AdminSignInGateProps) {
   const [pwOpen, setPwOpen] = useState(false);
 
   return (
@@ -17,7 +20,11 @@ export default function AdminSignInGate({ title, description }: AdminSignInGateP
       <Stack gap={4}>
         <Heading size="lg">{title}</Heading>
         <Text color="fg.muted">{description}</Text>
-        <Button colorPalette="blue" w="fit-content" onClick={() => setPwOpen(true)}>
+        <Button
+          colorPalette="blue"
+          w="fit-content"
+          onClick={() => setPwOpen(true)}
+        >
           Sign in to admin
         </Button>
       </Stack>

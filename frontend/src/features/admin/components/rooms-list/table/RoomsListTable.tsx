@@ -9,7 +9,10 @@ interface RoomsListTableProps {
   onDeleteRoom: (roomId: string) => void;
 }
 
-export default function RoomsListTable({ rooms, onDeleteRoom }: RoomsListTableProps) {
+export default function RoomsListTable({
+  rooms,
+  onDeleteRoom,
+}: RoomsListTableProps) {
   return (
     <Table.Root size="sm" variant="outline">
       <Table.Header>

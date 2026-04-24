@@ -21,7 +21,12 @@ export default function RoomsListRow({ room, onDelete }: RoomsListRowProps) {
               Edit
             </Button>
           </RouterLink>
-          <Button size="xs" colorPalette="red" variant="outline" onClick={onDelete}>
+          <Button
+            size="xs"
+            colorPalette="red"
+            variant="outline"
+            onClick={onDelete}
+          >
             Delete
           </Button>
         </HStack>

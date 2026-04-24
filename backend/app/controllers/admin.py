@@ -25,7 +25,7 @@ from app.services.room_admin_service import RoomAdminService
 
 class AdminRoomsController(Controller):
     path = "/admin/rooms"
-    guards: ClassVar[list[Guard]] = [require_admin_scope]
+    guards: ClassVar[tuple[Guard, ...]] = (require_admin_scope,)
 
     @get("/", sync_to_thread=False)
     def list(
@@ -70,7 +70,7 @@ class AdminRoomsController(Controller):
 
 class AdminDesksController(Controller):
     path = "/admin/desks"
-    guards: ClassVar[list[Guard]] = [require_admin_scope]
+    guards: ClassVar[tuple[Guard, ...]] = (require_admin_scope,)
 
     @post("/", status_code=HTTP_201_CREATED, sync_to_thread=False)
     def create(self, data: AdminDeskCreate, desk_admin_service: DeskAdminService) -> AdminDeskRead:

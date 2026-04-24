@@ -7,7 +7,9 @@ interface DeskRoomStatusStripProps {
   desks: DeskDto[];
 }
 
-export default function DeskRoomStatusStrip({ desks }: DeskRoomStatusStripProps) {
+export default function DeskRoomStatusStrip({
+  desks,
+}: DeskRoomStatusStripProps) {
   return (
     <HStack gap={1.5} align="center" aria-label="Status per desk">
       {desks.map((desk) => (

@@ -71,7 +71,10 @@ const AppLayout = ({ children }: AppLayoutProps) => {
                           Sign out of admin
                         </Menu.Item>
                       ) : (
-                        <Menu.Item value="signin" onClick={() => setPwOpen(true)}>
+                        <Menu.Item
+                          value="signin"
+                          onClick={() => setPwOpen(true)}
+                        >
                           Sign in to admin…
                         </Menu.Item>
                       )}

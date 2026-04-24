@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import uuid
 from datetime import date
+from typing import Any, cast
 
 from sqlalchemy import ColumnElement, and_, func, select
 from sqlalchemy.orm import Session, selectinload
@@ -10,16 +11,19 @@ from app.models import Booking, Desk, Room
 from app.schema.list_query import RoomListQuery, RoomListSort
 
 
-def _room_primary_order(sort: RoomListSort) -> ColumnElement:
+def _room_primary_order(sort: RoomListSort) -> ColumnElement[Any]:
     col = getattr(Room, sort.sort_by)
-    return col.asc() if sort.sort_order == "asc" else col.desc()
+    return cast(
+        "ColumnElement[Any]",
+        col.asc() if sort.sort_order == "asc" else col.desc(),
+    )
 
 
 class RoomRepository:
     def __init__(self, session: Session) -> None:
         self._session = session
 
-    def list(
+    def list_rooms(
         self, query: RoomListQuery
     ) -> list[Room] | list[tuple[Room, Desk | None, Booking | None]]:
         """List rooms; shape depends on ``query.filter.booking_date`` (see ``RoomListFilter``)."""
@@ -27,9 +31,7 @@ class RoomRepository:
         if day is not None:
             return self._list_joined_for_booking_day(day, query.sort)
         stmt = (
-            select(Room)
-            .options(selectinload(Room.desks))
-            .order_by(_room_primary_order(query.sort))
+            select(Room).options(selectinload(Room.desks)).order_by(_room_primary_order(query.sort))
         )
         return list(self._session.scalars(stmt))
 
@@ -56,11 +58,7 @@ class RoomRepository:
         return [(r[0], r[1], r[2]) for r in self._session.execute(q)]
 
     def get(self, room_id: uuid.UUID) -> Room | None:
-        stmt = (
-            select(Room)
-            .options(selectinload(Room.desks))
-            .where(Room.id == room_id)
-        )
+        stmt = select(Room).options(selectinload(Room.desks)).where(Room.id == room_id)
         return self._session.scalar(stmt)
 
     def add(self, room: Room) -> None:

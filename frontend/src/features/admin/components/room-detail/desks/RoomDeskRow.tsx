@@ -56,7 +56,9 @@ export default function RoomDeskRow({
         <input
           type="checkbox"
           checked={draft.has_mouse}
-          onChange={(e) => onDraftChange(desk.id, { has_mouse: e.target.checked })}
+          onChange={(e) =>
+            onDraftChange(desk.id, { has_mouse: e.target.checked })
+          }
           aria-label="Mouse available"
         />
       </Table.Cell>
@@ -70,7 +72,12 @@ export default function RoomDeskRow({
           >
             Save
           </Button>
-          <Button size="xs" colorPalette="red" variant="outline" onClick={onDelete}>
+          <Button
+            size="xs"
+            colorPalette="red"
+            variant="outline"
+            onClick={onDelete}
+          >
             Delete
           </Button>
         </HStack>

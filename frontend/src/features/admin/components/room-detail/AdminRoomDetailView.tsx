@@ -51,7 +51,11 @@ export default function AdminRoomDetailView({
       <Stack gap={6}>
         <RoomDetailBackNav />
 
-        <RoomDetailQueryStatus isPending={isPending} isError={isError} error={error} />
+        <RoomDetailQueryStatus
+          isPending={isPending}
+          isError={isError}
+          error={error}
+        />
 
         {room ? (
           <>

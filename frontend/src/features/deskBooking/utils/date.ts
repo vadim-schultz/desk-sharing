@@ -41,6 +41,11 @@ function secondsSinceMidnightInTimezone(timezone: string, date: Date): number {
 const SAME_DAY_CUTOFF_SECONDS = 10 * 3600;
 
 /** True if local time in `timezone` is after 10:00 on today's calendar date. */
-export function isPastSameDayBookingCutoffInTimezone(timezone: string): boolean {
-  return secondsSinceMidnightInTimezone(timezone, new Date()) > SAME_DAY_CUTOFF_SECONDS;
+export function isPastSameDayBookingCutoffInTimezone(
+  timezone: string,
+): boolean {
+  return (
+    secondsSinceMidnightInTimezone(timezone, new Date()) >
+    SAME_DAY_CUTOFF_SECONDS
+  );
 }

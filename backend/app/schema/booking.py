@@ -99,9 +99,7 @@ class BookingCreatePreconditions(BaseModel):
 
     @model_validator(mode="after")
     def _same_day_booking_must_respect_cutoff(self) -> Self:
-        if self.booking_date == self.today and is_past_same_day_booking_cutoff(
-            self.now, self.tz
-        ):
+        if self.booking_date == self.today and is_past_same_day_booking_cutoff(self.now, self.tz):
             msg = "same-day bookings are not available after 10:00"
             raise ValueError(msg)
         return self

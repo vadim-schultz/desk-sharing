@@ -48,8 +48,13 @@ export default function AdminRoomDetailPage() {
   }, [roomQuery.data]);
 
   const patchMutation = useMutation({
-    mutationFn: ({ deskId, body }: { deskId: string; body: Partial<DeskDraft> }) =>
-      patchAdminDesk(getToken, deskId, body),
+    mutationFn: ({
+      deskId,
+      body,
+    }: {
+      deskId: string;
+      body: Partial<DeskDraft>;
+    }) => patchAdminDesk(getToken, deskId, body),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['admin-room', roomId] });
       void queryClient.invalidateQueries({ queryKey: ['admin-rooms'] });

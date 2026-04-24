@@ -1,4 +1,4 @@
-"""Insert rooms from `rooms.txt` and a random 1–12 desks per room."""
+"""Insert rooms from `rooms.txt` and a random 1-12 desks per room."""
 
 from __future__ import annotations
 

@@ -60,6 +60,10 @@ disallow_untyped_defs = true
 packages = ["app", "scripts"]
 plugins = ["sqlalchemy.ext.mypy.plugin"]
 
+[[tool.mypy.overrides]]
+module = "app.controllers.admin"
+disable_error_code = ["misc"]
+
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]

@@ -48,7 +48,11 @@ export default function AdminRoomsListView({
       <Stack gap={6}>
         <RoomsListToolbar onRequestCreateRoom={onRequestCreateRoom} />
 
-        <RoomsListQueryStatus isPending={isPending} isError={isError} error={error} />
+        <RoomsListQueryStatus
+          isPending={isPending}
+          isError={isError}
+          error={error}
+        />
 
         {rooms !== undefined ? (
           <RoomsListTable rooms={rooms} onDeleteRoom={onDeleteRoom} />

@@ -5,7 +5,9 @@ export interface AuthTokenResponse {
   expires_in: number;
 }
 
-export async function requestToken(password: string): Promise<AuthTokenResponse> {
+export async function requestToken(
+  password: string,
+): Promise<AuthTokenResponse> {
   const res = await fetch(url('/auth/token'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

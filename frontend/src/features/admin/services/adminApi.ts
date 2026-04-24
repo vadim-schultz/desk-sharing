@@ -70,7 +70,9 @@ export async function deleteAdminRoom(
   getToken: () => string | null,
   roomId: string,
 ): Promise<void> {
-  await adminJson<void>(`/admin/rooms/${roomId}`, getToken, { method: 'DELETE' });
+  await adminJson<void>(`/admin/rooms/${roomId}`, getToken, {
+    method: 'DELETE',
+  });
 }
 
 export async function createAdminDesk(
@@ -113,5 +115,7 @@ export async function deleteAdminDesk(
   getToken: () => string | null,
   deskId: string,
 ): Promise<void> {
-  await adminJson<void>(`/admin/desks/${deskId}`, getToken, { method: 'DELETE' });
+  await adminJson<void>(`/admin/desks/${deskId}`, getToken, {
+    method: 'DELETE',
+  });
 }

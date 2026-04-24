@@ -72,16 +72,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     !!auth.expiresAt &&
     Date.now() < auth.expiresAt - EXPIRY_BUFFER_MS;
 
-  const authenticate = useCallback(async (password: string): Promise<string> => {
-    const { access_token, expires_in } = await requestToken(password);
-    const next: AuthState = {
-      token: access_token,
-      expiresAt: Date.now() + expires_in * 1000,
-    };
-    setAuth(next);
-    writeStored(next);
-    return access_token;
-  }, []);
+  const authenticate = useCallback(
+    async (password: string): Promise<string> => {
+      const { access_token, expires_in } = await requestToken(password);
+      const next: AuthState = {
+        token: access_token,
+        expiresAt: Date.now() + expires_in * 1000,
+      };
+      setAuth(next);
+      writeStored(next);
+      return access_token;
+    },
+    [],
+  );
 
   const clearToken = useCallback(() => {
     const next = { token: null, expiresAt: null };
@@ -94,9 +97,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     [getToken, isAuthenticated, authenticate, clearToken],
   );
 
-  return (
-    <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 /* eslint-disable react-refresh/only-export-components -- hook is tied to this provider */

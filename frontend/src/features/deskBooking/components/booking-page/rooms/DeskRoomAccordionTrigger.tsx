@@ -8,7 +8,9 @@ interface DeskRoomAccordionTriggerProps {
   room: RoomDto;
 }
 
-export default function DeskRoomAccordionTrigger({ room }: DeskRoomAccordionTriggerProps) {
+export default function DeskRoomAccordionTrigger({
+  room,
+}: DeskRoomAccordionTriggerProps) {
   return (
     <Accordion.ItemTrigger>
       <HStack

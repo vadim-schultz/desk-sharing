@@ -59,9 +59,7 @@ class AdminRoomCreate(BaseModel):
 
 
 class AdminRoomUpdate(BaseModel):
-    room_number: StrippedOptionalStr = Field(
-        default=None, min_length=1, max_length=64
-    )
+    room_number: StrippedOptionalStr = Field(default=None, min_length=1, max_length=64)
     description: StrippedOptionalStr = Field(default=None, max_length=500)
     name: StrippedOptionalStr = Field(default=None, min_length=1, max_length=600)
     sort_order: int | None = None

@@ -9,7 +9,11 @@ interface PasswordModalProps {
   onSuccess?: (token: string) => void;
 }
 
-const PasswordModal = ({ open, onOpenChange, onSuccess }: PasswordModalProps) => {
+const PasswordModal = ({
+  open,
+  onOpenChange,
+  onSuccess,
+}: PasswordModalProps) => {
   const { authenticate } = useAuth();
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -83,7 +87,11 @@ const PasswordModal = ({ open, onOpenChange, onSuccess }: PasswordModalProps) =>
             </Stack>
           </Dialog.Body>
           <Dialog.Footer>
-            <Button variant="ghost" mr="auto" onClick={() => onOpenChange(false)}>
+            <Button
+              variant="ghost"
+              mr="auto"
+              onClick={() => onOpenChange(false)}
+            >
               Cancel
             </Button>
             <Button

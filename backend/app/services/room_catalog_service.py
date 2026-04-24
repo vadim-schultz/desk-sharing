@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import uuid
 from datetime import date, datetime
+from typing import cast
 
 from app.config import settings
 from app.models import Booking, Desk, Room
@@ -38,9 +39,10 @@ class RoomCatalogService:
             filter=RoomListFilter(booking_date=day),
             sort=query.sort,
         )
-        rows = self._rooms.list(list_query)
-        assert isinstance(rows, list), "expected list from repository"
-        assert not rows or isinstance(rows[0], tuple), "expected join rows when booking_date is set"
+        rows = cast(
+            "list[tuple[Room, Desk | None, Booking | None]]",
+            self._rooms.list_rooms(list_query),
+        )
 
         order: list[uuid.UUID] = []
         grouped: dict[uuid.UUID, list[tuple[Desk, Booking | None]]] = {}

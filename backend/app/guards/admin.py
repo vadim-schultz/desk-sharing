@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 from litestar.connection import ASGIConnection
 from litestar.exceptions import NotAuthorizedException
 from litestar.handlers import BaseRouteHandler
@@ -7,7 +9,10 @@ from litestar.handlers import BaseRouteHandler
 _BEARER_PREFIX = "Bearer "
 
 
-def require_admin_scope(connection: ASGIConnection, _: BaseRouteHandler) -> None:
+def require_admin_scope(
+    connection: ASGIConnection[Any, Any, Any, Any],
+    _: BaseRouteHandler,
+) -> None:
     """Reject requests without valid ``Authorization: Bearer`` admin JWT."""
     auth_header = connection.headers.get("authorization", "")
     if not auth_header.lower().startswith(_BEARER_PREFIX.lower()):

@@ -20,4 +20,4 @@ class AuthController(Controller):
     ) -> AuthTokenResponse:
         repo = AuthRepository(session)
         result = auth_service.authenticate(repo, data.password)
-        return AuthTokenResponse(**result)
+        return AuthTokenResponse.model_validate(result)

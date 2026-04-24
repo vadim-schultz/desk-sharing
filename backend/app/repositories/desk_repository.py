@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import uuid
+from typing import Any, cast
 
 from sqlalchemy import ColumnElement, func, select
 from sqlalchemy.orm import Session
@@ -9,9 +10,12 @@ from app.models import Desk
 from app.schema.list_query import DeskListQuery, DeskListSort
 
 
-def _desk_primary_order(sort: DeskListSort) -> ColumnElement:
+def _desk_primary_order(sort: DeskListSort) -> ColumnElement[Any]:
     col = getattr(Desk, sort.sort_by)
-    return col.asc() if sort.sort_order == "asc" else col.desc()
+    return cast(
+        "ColumnElement[Any]",
+        col.asc() if sort.sort_order == "asc" else col.desc(),
+    )
 
 
 class DeskRepository:
