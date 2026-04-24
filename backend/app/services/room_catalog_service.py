@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 import uuid
+from collections import defaultdict
 from datetime import date, datetime
-from typing import cast
 
 from app.config import settings
-from app.models import Booking, Desk, Room
+from app.domain.room_listing_slots import BookingSlot, DeskSlot
+from app.models import Room
 from app.repositories import RoomRepository
 from app.schema.desk import DeskRead
 from app.schema.enums import DeskDayStatus
@@ -39,20 +40,17 @@ class RoomCatalogService:
             filter=RoomListFilter(booking_date=day),
             sort=query.sort,
         )
-        rows = cast(
-            "list[tuple[Room, Desk | None, Booking | None]]",
-            self._rooms.list_rooms(list_query),
-        )
+        rows = self._rooms.list_rooms(list_query)
 
         order: list[uuid.UUID] = []
-        grouped: dict[uuid.UUID, list[tuple[Desk, Booking | None]]] = {}
+        grouped: dict[uuid.UUID, list[tuple[DeskSlot, BookingSlot]]] = defaultdict(list)
         room_by_id: dict[uuid.UUID, Room] = {}
-        for room, desk, booking in rows:
+        for row in rows:
+            room, desk, booking = row.room, row.desk, row.booking
             if room.id not in room_by_id:
                 room_by_id[room.id] = room
                 order.append(room.id)
-                grouped[room.id] = []
-            if desk is not None:
+            if desk.participates_in_layout():
                 grouped[room.id].append((desk, booking))
 
         result: list[RoomRead] = []
@@ -86,11 +84,11 @@ class RoomCatalogService:
         return day, result
 
     def _desk_status(
-        self, desk: Desk, booking: Booking | None
+        self, desk: DeskSlot, booking: BookingSlot
     ) -> tuple[DeskDayStatus, uuid.UUID | None]:
         if not desk.bookable:
             return DeskDayStatus.unavailable, None
-        if booking is None:
+        if not booking.has_reservation_for_day():
             return DeskDayStatus.bookable, None
         if booking.checked_in_at is not None:
             return DeskDayStatus.booked, booking.id

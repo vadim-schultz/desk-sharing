@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import uuid
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 from sqlalchemy import Boolean, ForeignKey, Integer, String, UniqueConstraint, Uuid
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -11,6 +11,7 @@ from app.models.base import Base
 if TYPE_CHECKING:
     from app.models.booking import Booking
     from app.models.room import Room
+    from app.schema.admin import AdminDeskRead
 
 
 class Desk(Base):
@@ -30,3 +31,11 @@ class Desk(Base):
 
     room: Mapped[Room] = relationship("Room", back_populates="desks")
     bookings: Mapped[list[Booking]] = relationship("Booking", back_populates="desk")
+
+    def participates_in_layout(self) -> Literal[True]:
+        return True
+
+    def to_admin_desk_read(self) -> AdminDeskRead:
+        from app.schema.admin import AdminDeskRead as AdminDeskReadModel
+
+        return AdminDeskReadModel.model_validate(self)

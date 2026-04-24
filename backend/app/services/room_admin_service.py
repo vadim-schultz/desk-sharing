@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import uuid
-from typing import cast
+from collections import defaultdict
 
 from litestar.exceptions import NotFoundException
 from sqlalchemy.orm import Session
@@ -36,12 +36,34 @@ class RoomAdminService:
         self._rooms = rooms
 
     def list(self, query: RoomListQuery) -> AdminRoomsListResponse:
-        raw = self._rooms.list_rooms(query)
-        if raw and isinstance(raw[0], tuple):
+        if query.filter.booking_date is not None:
             msg = "admin room list must not set booking_date on filter"
             raise ValueError(msg)
-        rooms = cast("list[Room]", raw)
-        return AdminRoomsListResponse(rooms=[to_admin_room_read(r) for r in rooms])
+        rows = self._rooms.list_rooms(query)
+        order: list[uuid.UUID] = []
+        room_by_id: dict[uuid.UUID, Room] = {}
+        desks_by_room: dict[uuid.UUID, list[AdminDeskRead]] = defaultdict(list)
+        for row in rows:
+            rid = row.room.id
+            if rid not in room_by_id:
+                room_by_id[rid] = row.room
+                order.append(rid)
+            if row.desk.participates_in_layout():
+                desk_read = row.desk.to_admin_desk_read()
+                if desk_read is not None:
+                    desks_by_room[rid].append(desk_read)
+        rooms_out = [
+            AdminRoomRead(
+                id=room_by_id[rid].id,
+                room_number=room_by_id[rid].room_number,
+                description=room_by_id[rid].description,
+                name=room_by_id[rid].name,
+                sort_order=room_by_id[rid].sort_order,
+                desks=desks_by_room[rid],
+            )
+            for rid in order
+        ]
+        return AdminRoomsListResponse(rooms=rooms_out)
 
     def get(self, room_id: uuid.UUID) -> AdminRoomRead:
         room = self._rooms.get(room_id)
