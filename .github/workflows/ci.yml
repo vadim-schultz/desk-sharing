@@ -64,14 +64,13 @@ jobs:
           cache: npm
           cache-dependency-path: frontend/package-lock.json
 
-      # Mitigate intermittent npm "Exit handler never called" on ubuntu runners
-      # (parallel lifecycle + memory); foreground-scripts + heap + one retry.
+      # npm ci intermittently crashes on ubuntu-latest with npm 10.x ("Exit handler
+      # never called"); npm install from a committed package-lock is equivalent on
+      # a clean checkout and avoids that code path.
       - name: Install dependencies
         env:
           NODE_OPTIONS: --max-old-space-size=8192
-        run: |
-          npm_ci() { npm ci --foreground-scripts --no-audit --no-fund; }
-          npm_ci || { rm -rf node_modules; npm_ci; }
+        run: npm install --foreground-scripts --no-audit --no-fund
 
       - name: Lint
         run: npm run lint
