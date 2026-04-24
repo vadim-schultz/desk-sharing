@@ -49,13 +49,22 @@ def test_admin_rooms_crud(client: TestClient[Litestar]) -> None:
     assert create.status_code == 201, create.text
     room_id = create.json()["id"]
 
+    patch_room = client.patch(
+        f"/admin/rooms/{room_id}",
+        headers=headers,
+        json={"description": "Updated desc"},
+    )
+    assert patch_room.status_code == 200, patch_room.text
+    assert patch_room.json()["description"] == "Updated desc"
+
     r = client.get("/admin/rooms", headers=headers)
     assert len(r.json()["rooms"]) == 1
 
     desk = client.post(
-        f"/admin/rooms/{room_id}/desks",
+        "/admin/desks",
         headers=headers,
         json={
+            "room_id": str(room_id),
             "name": "Desk 1",
             "bookable": True,
             "monitor_count": 2,

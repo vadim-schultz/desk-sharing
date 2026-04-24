@@ -85,9 +85,9 @@ export async function createAdminDesk(
     sort_order?: number | null;
   },
 ): Promise<AdminDeskDto> {
-  return adminJson<AdminDeskDto>(`/admin/rooms/${roomId}/desks`, getToken, {
+  return adminJson<AdminDeskDto>('/admin/desks', getToken, {
     method: 'POST',
-    body: JSON.stringify(body),
+    body: JSON.stringify({ room_id: roomId, ...body }),
   });
 }
 

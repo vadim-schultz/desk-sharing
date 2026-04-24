@@ -39,7 +39,7 @@ def test_booking_flow(
     # Frozen 08:00 so same-day is before 10:00 cutoff.
     book_day: date = datetime.now(tz=tz).date()
 
-    r = client.get("/rooms", params={"booking_date": book_day.isoformat()})
+    r = client.get("/rooms", params={"date": book_day.isoformat()})
     assert r.status_code == 200
     desk_payload = r.json()["rooms"][0]["desks"][0]
     assert desk_payload["status"] == "bookable"
@@ -55,7 +55,7 @@ def test_booking_flow(
     assert create.status_code == 201, create.text
     booking_id = create.json()["id"]
 
-    r2 = client.get("/rooms", params={"booking_date": book_day.isoformat()})
+    r2 = client.get("/rooms", params={"date": book_day.isoformat()})
     assert r2.json()["rooms"][0]["desks"][0]["status"] == "pending"
 
     check = client.post(
@@ -64,5 +64,5 @@ def test_booking_flow(
     )
     assert check.status_code == 201, check.text
 
-    r3 = client.get("/rooms", params={"booking_date": book_day.isoformat()})
+    r3 = client.get("/rooms", params={"date": book_day.isoformat()})
     assert r3.json()["rooms"][0]["desks"][0]["status"] == "booked"

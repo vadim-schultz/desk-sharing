@@ -22,5 +22,8 @@ class Room(Base):
     sort_order: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
 
     desks: Mapped[list[Desk]] = relationship(
-        "Desk", back_populates="room", cascade="all, delete-orphan", order_by="Desk.sort_order"
+        "Desk",
+        back_populates="room",
+        cascade="all, delete-orphan",
+        order_by="Desk.sort_order, Desk.name",
     )

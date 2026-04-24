@@ -1,9 +1,9 @@
 import {
   Box,
+  Button,
   Container,
   Heading,
   HStack,
-  IconButton,
   Menu,
   Portal,
   VStack,
@@ -48,14 +48,14 @@ const AppLayout = ({ children }: AppLayoutProps) => {
             <HStack gap={1}>
               <Menu.Root positioning={{ placement: 'bottom-end' }}>
                 <Menu.Trigger asChild>
-                  <IconButton
+                  <Button
                     aria-label="Account menu"
                     variant="ghost"
                     size="sm"
                     colorPalette="gray"
                   >
                     <FaUser />
-                  </IconButton>
+                  </Button>
                 </Menu.Trigger>
                 <Portal>
                   <Menu.Positioner>

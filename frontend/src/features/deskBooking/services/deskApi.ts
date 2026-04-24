@@ -11,10 +11,8 @@ export function url(path: string): string {
   return `${b}${p}`;
 }
 
-export async function fetchRooms(bookingDate?: string): Promise<RoomsResponse> {
-  const qs = bookingDate
-    ? `?booking_date=${encodeURIComponent(bookingDate)}`
-    : '';
+export async function fetchRooms(viewDate?: string): Promise<RoomsResponse> {
+  const qs = viewDate ? `?date=${encodeURIComponent(viewDate)}` : '';
   const res = await fetch(url(`/rooms${qs}`));
   if (!res.ok) {
     throw new Error(await res.text());

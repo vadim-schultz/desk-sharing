@@ -3,20 +3,39 @@ from __future__ import annotations
 import uuid
 from datetime import date
 
-from sqlalchemy import and_, func, select
+from sqlalchemy import ColumnElement, and_, func, select
 from sqlalchemy.orm import Session, selectinload
 
 from app.models import Booking, Desk, Room
+from app.schema.list_query import RoomListQuery, RoomListSort
+
+
+def _room_primary_order(sort: RoomListSort) -> ColumnElement:
+    col = getattr(Room, sort.sort_by)
+    return col.asc() if sort.sort_order == "asc" else col.desc()
 
 
 class RoomRepository:
     def __init__(self, session: Session) -> None:
         self._session = session
 
-    def list_rooms_with_desk_booking_for_date(
-        self, day: date
+    def list(
+        self, query: RoomListQuery
+    ) -> list[Room] | list[tuple[Room, Desk | None, Booking | None]]:
+        """List rooms; shape depends on ``query.filter.booking_date`` (see ``RoomListFilter``)."""
+        day = query.filter.booking_date
+        if day is not None:
+            return self._list_joined_for_booking_day(day, query.sort)
+        stmt = (
+            select(Room)
+            .options(selectinload(Room.desks))
+            .order_by(_room_primary_order(query.sort))
+        )
+        return list(self._session.scalars(stmt))
+
+    def _list_joined_for_booking_day(
+        self, day: date, sort: RoomListSort
     ) -> list[tuple[Room, Desk | None, Booking | None]]:
-        """All rooms, left-joined to desks, left-joined to the booking for ``day`` (if any)."""
         q = (
             select(Room, Desk, Booking)
             .select_from(Room)
@@ -29,22 +48,12 @@ class RoomRepository:
                 ),
             )
             .order_by(
-                Room.sort_order,
-                Room.room_number,
-                Room.name,
-                Desk.sort_order,
-                Desk.name,
+                _room_primary_order(sort),
+                Desk.sort_order.asc(),
+                Desk.name.asc(),
             )
         )
         return [(r[0], r[1], r[2]) for r in self._session.execute(q)]
-
-    def find_all(self) -> list[Room]:
-        stmt = (
-            select(Room)
-            .options(selectinload(Room.desks))
-            .order_by(Room.sort_order, Room.room_number, Room.name)
-        )
-        return list(self._session.scalars(stmt))
 
     def get(self, room_id: uuid.UUID) -> Room | None:
         stmt = (

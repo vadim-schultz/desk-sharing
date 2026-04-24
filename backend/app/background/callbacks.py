@@ -3,12 +3,11 @@ from __future__ import annotations
 from sqlalchemy.orm import Session
 
 from app.background.registry import register_callback
+from app.services.maintenance import release_stale_pending_bookings
 
 
 def _release_stale_pending(session: Session) -> None:
-    from app.dependencies import create_booking_service
-
-    create_booking_service(session).release_stale_pending()
+    release_stale_pending_bookings(session)
 
 
 def register_default_callbacks() -> None:

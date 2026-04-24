@@ -1,8 +1,27 @@
 from __future__ import annotations
 
 import uuid
+from typing import Annotated
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, BeforeValidator, Field
+
+
+def _strip_str(v: object) -> object:
+    if isinstance(v, str):
+        return v.strip()
+    return v
+
+
+def _strip_optional_str(v: object) -> object:
+    if v is None:
+        return None
+    if isinstance(v, str):
+        return v.strip()
+    return v
+
+
+StrippedStr = Annotated[str, BeforeValidator(_strip_str)]
+StrippedOptionalStr = Annotated[str | None, BeforeValidator(_strip_optional_str)]
 
 
 class AdminDeskRead(BaseModel):
@@ -33,21 +52,24 @@ class AdminRoomsListResponse(BaseModel):
 
 
 class AdminRoomCreate(BaseModel):
-    room_number: str = Field(..., min_length=1, max_length=64)
-    description: str = Field(default="", max_length=500)
-    name: str | None = Field(default=None, min_length=1, max_length=600)
+    room_number: StrippedStr = Field(..., min_length=1, max_length=64)
+    description: StrippedStr = Field(default="", max_length=500)
+    name: StrippedOptionalStr = Field(default=None, min_length=1, max_length=600)
     sort_order: int | None = None
 
 
 class AdminRoomUpdate(BaseModel):
-    room_number: str | None = Field(default=None, min_length=1, max_length=64)
-    description: str | None = Field(default=None, max_length=500)
-    name: str | None = Field(default=None, min_length=1, max_length=600)
+    room_number: StrippedOptionalStr = Field(
+        default=None, min_length=1, max_length=64
+    )
+    description: StrippedOptionalStr = Field(default=None, max_length=500)
+    name: StrippedOptionalStr = Field(default=None, min_length=1, max_length=600)
     sort_order: int | None = None
 
 
 class AdminDeskCreate(BaseModel):
-    name: str = Field(..., min_length=1, max_length=200)
+    room_id: uuid.UUID
+    name: StrippedStr = Field(..., min_length=1, max_length=200)
     bookable: bool = True
     monitor_count: int = Field(default=0, ge=0)
     has_keyboard: bool = False
@@ -56,7 +78,7 @@ class AdminDeskCreate(BaseModel):
 
 
 class AdminDeskUpdate(BaseModel):
-    name: str | None = Field(default=None, min_length=1, max_length=200)
+    name: StrippedOptionalStr = Field(default=None, min_length=1, max_length=200)
     bookable: bool | None = None
     monitor_count: int | None = Field(default=None, ge=0)
     has_keyboard: bool | None = None

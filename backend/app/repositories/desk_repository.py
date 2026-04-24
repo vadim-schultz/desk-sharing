@@ -2,21 +2,31 @@ from __future__ import annotations
 
 import uuid
 
-from sqlalchemy import func, select
+from sqlalchemy import ColumnElement, func, select
 from sqlalchemy.orm import Session
 
 from app.models import Desk
+from app.schema.list_query import DeskListQuery, DeskListSort
+
+
+def _desk_primary_order(sort: DeskListSort) -> ColumnElement:
+    col = getattr(Desk, sort.sort_by)
+    return col.asc() if sort.sort_order == "asc" else col.desc()
 
 
 class DeskRepository:
     def __init__(self, session: Session) -> None:
         self._session = session
 
-    def list(self, room_id: uuid.UUID) -> list[Desk]:
+    def list(self, query: DeskListQuery) -> list[Desk]:
         stmt = (
             select(Desk)
-            .where(Desk.room_id == room_id)
-            .order_by(Desk.sort_order, Desk.name)
+            .where(Desk.room_id == query.filter.room_id)
+            .order_by(
+                _desk_primary_order(query.sort),
+                Desk.sort_order.asc(),
+                Desk.name.asc(),
+            )
         )
         return list(self._session.scalars(stmt))
 
@@ -33,9 +43,3 @@ class DeskRepository:
         return self._session.scalar(
             select(func.max(Desk.sort_order)).where(Desk.room_id == room_id)
         )
-
-    def count(self, room_id: uuid.UUID) -> int:
-        n = self._session.scalar(
-            select(func.count()).select_from(Desk).where(Desk.room_id == room_id)
-        )
-        return int(n or 0)
