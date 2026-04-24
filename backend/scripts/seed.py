@@ -1,7 +1,8 @@
-"""Insert rooms from `rooms.txt` and four desks per room."""
+"""Insert rooms from `rooms.txt` and a random 1–12 desks per room."""
 
 from __future__ import annotations
 
+import random
 import uuid
 
 from app.db import SessionLocal, engine
@@ -35,7 +36,8 @@ def seed(session: Session) -> None:
 
     desks: list[Desk] = []
     for room in rooms:
-        for i in range(4):
+        desk_count = random.randint(1, 12)
+        for i in range(desk_count):
             desks.append(
                 Desk(
                     id=uuid.uuid4(),

@@ -1,72 +1,10 @@
-4-028-14 - RF-Labor/Testber.
-4-028-15 - Büro
-4-028-18 - Demo-Lab
-4-028-17 - Büro
-4-028-09 - Lab-Serverraum
-4-028-07 - Integr-Testbereich
-4-028-06 - Verification-Testbereich
-4-034-07 - Lagerraum
-4-034-05 - Bespr-Raum
-4-034-11 - Bespr-Raum
-4-034-01 - Küche
-4-034-12 - Durchgangsbereich
-4-034-13 - Pausenraum
-4-033-13 - Büro
-4-033-11 - Bespr-Raum
-4-033-17 - Büro
-4-033-20 - Bespr-Raum
-4-032-14 - Büro
-4-032-20 - Bespr-Raum
-4-032-21 - Büro
-4-032-06 - Büro
-4-032-11 - Büro
-4-032-12 - Büro
-4-033-06 - Büro
-4-033-07 - Büro
-4-032-16 - Büro
-4-032-19 - Büro
-4-028-13 - Lagerraum
-4-028-12 - Workshopraum
-4-032-18 - Tel-Box
-4-033-16 - Büro
-4-034-04 - Bespr-Raum
-4-028-10 - Schirmkammer
-4-033-08 - Serverraum
-4-028-11 - Hauptserver
-4-032-01 - Teeküche
-4-034-10 - Ruheraum
-4-033-09 - Wirtschaftsraum
-4-032-07 - Lagerraum
-4-033-12 - Lagerraum
-4-033-05 - WC H
-4-033-03 - WC D
-4-033-01 - Teeküche
-4-032-09 - Serverraum
-4-032-05 - WC H
-4-032-03 - WC D
-4-032-17 - Tel-Box
-4-032-10 - Bespr-Box
-4-032-15 - Tel-Box
-4-032-13 - Tel-Box
-4-033-19 - Tel-Box
-4-033-18 - Tel-Box
-4-033-14 - Tel-Box
-4-033-15 - Tel-Box
-4-034-03 - WC H
-4-028-05 - WC H
-4-028-03 - WC D
-4-028-16 - Tel-Box
-4-033-10 - Duschen
-4-032-22 - Bespr-Box
-4-034-08 - Eingangsbereich
-4-034-09 - Wartebereich
-4-032-08 - Tel-Box
-4-028-01 - Behinderten WC
-4-032-04 - WC H Vorr.
-4-032-02 - WC D Vorr.
-4-033-02 - WC D Vorr.
-4-033-04 - WC H Vorr.
-4-034-02 - WC H Vorr.
-4-028-02 - WC D Vorr.
-4-028-04 - WC H Vorr.
-4-034-06 - Bespr-Raum
+1-001-01 - Zugspitze
+1-001-02 - Watzmann
+1-001-03 - Großer Arber
+1-001-04 - Feldberg
+1-001-05 - Brocken
+1-001-06 - Wasserkuppe
+1-001-07 - Kahler Asten
+1-001-08 - Erbeskopf
+1-001-09 - Belchen
+1-001-10 - Hornisgrinde
