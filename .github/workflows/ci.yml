@@ -58,14 +58,20 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: "22"
           cache: npm
           cache-dependency-path: frontend/package-lock.json
 
+      # Mitigate intermittent npm "Exit handler never called" on ubuntu runners
+      # (parallel lifecycle + memory); foreground-scripts + heap + one retry.
       - name: Install dependencies
-        run: npm ci
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192
+        run: |
+          npm_ci() { npm ci --foreground-scripts --no-audit --no-fund; }
+          npm_ci || { rm -rf node_modules; npm_ci; }
 
       - name: Lint
         run: npm run lint
@@ -77,4 +83,6 @@ jobs:
         run: npm run typecheck
 
       - name: Build
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192
         run: npm run build
